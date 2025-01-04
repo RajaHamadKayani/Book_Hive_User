@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "401459819675",
+    "project_id": "bookhive-d99ff",
+    "storage_bucket": "bookhive-d99ff.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:401459819675:android:af0f4782c1d3e3a325823e",
+        "android_client_info": {
+          "package_name": "com.example.book_hive_user"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBS3Tp5rqF4tzW5Ava3xzGrSP5e4KJ8NjI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:401459819675:android:4612c7b20e7afb0825823e",
+        "android_client_info": {
+          "package_name": "com.example.bookhive"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBS3Tp5rqF4tzW5Ava3xzGrSP5e4KJ8NjI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
