@@ -45,7 +45,7 @@ class BookService {
     }
   }
 
- // Stream for recommendations
+  // Stream for recommendations
   Stream<List<Map<String, dynamic>>> getRecommendationsStream(String bookId) {
     return _firestore.collection('books').doc(bookId).snapshots().map((doc) {
       if (doc.exists) {
@@ -57,13 +57,19 @@ class BookService {
   }
 
   // Add a recommendation to Firestore
-  Future<void> addRecommendation(String bookId, String userId, String recommendation, String userName) async {
+  Future<void> addRecommendation(String bookId, String userId,
+      String recommendation, String userName, String dateTime) async {
     try {
       final bookRef = _firestore.collection('books').doc(bookId);
 
       await bookRef.update({
         'recommendations': FieldValue.arrayUnion([
-          {'userId': userId, 'recommendation': recommendation,'userName':userName},
+          {
+            'userId': userId,
+            'recommendation': recommendation,
+            'userName': userName,
+            "dateTime": dateTime
+          },
         ]),
       });
     } catch (e) {

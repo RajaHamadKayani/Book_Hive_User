@@ -1,6 +1,7 @@
 import 'package:book_hive_user/services/firestore_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class BookDetailsPage extends StatefulWidget {
   final String bookName;
@@ -10,7 +11,7 @@ class BookDetailsPage extends StatefulWidget {
   final String description;
   final DateTime dateTime;
   final String userId;
-final String userName;
+  final String userName;
   const BookDetailsPage({
     super.key,
     required this.bookName,
@@ -53,7 +54,9 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 16,),
+            SizedBox(
+              height: 16,
+            ),
             // Top Cover
             Center(
               child: Container(
@@ -71,7 +74,6 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                 ),
               ),
             ),
-
 
             // Book Details
             Padding(
@@ -225,67 +227,113 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
               ),
             ),
             const SizedBox(height: 10),
-          StreamBuilder<List<Map<String, dynamic>>>(
-  stream: _firestoreService.getRecommendationsStream(widget.bookId),
-  builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (snapshot.hasError) {
-      return Text("Error: ${snapshot.error}");
-    }
-    final recommendations = snapshot.data ?? [];
-    if (recommendations.isEmpty) {
-      return const Text("No recommendations yet.");
-    }
-    return Column(
-      children: recommendations.map((recommendation) {
-        return ListTile(
-          leading: Image.asset("assets/images/dummy_user_image.png"),
-          title: Text(
-            recommendation['userName'],
-            style: const TextStyle(color: Colors.black),
-          ),
-          subtitle: Text(recommendation['recommendation']),
-        );
-      }).toList(),
-    );
-  },
-),
-
-              const Divider(),
-
-              // Add Your Recommendation
-              const Text(
-                "Add Your Recommendation",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: recommendationController,
-                decoration: const InputDecoration(
-                  labelText: "Enter your recommendation",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () async {
-                  if (recommendationController.text.isNotEmpty) {
-                    await _firestoreService.addRecommendation(
-                      widget.bookId,
-                      widget.userId, // Replace with the current user's ID
-                      recommendationController.text,
-                      widget.userName,
+            StreamBuilder<List<Map<String, dynamic>>>(
+              stream: _firestoreService.getRecommendationsStream(widget.bookId),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return Text("Error: ${snapshot.error}");
+                }
+                final recommendations = snapshot.data ?? [];
+                if (recommendations.isEmpty) {
+                  return const Text("No recommendations yet.");
+                }
+                return Column(
+                  children: recommendations.map((recommendation) {
+                    return ListTile(
+                      leading:
+                          Image.asset("assets/images/dummy_user_image.png"),
+                      title: Text(
+                        recommendation['userName'],
+                        style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            fontFamily: "Pulp"),
+                      ),
+                      trailing: Text(
+                        recommendation['dateTime'],
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w400,
+                            fontFamily: "Pulp",
+                            fontSize: 12),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            recommendation['recommendation'],
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w300,
+                                fontFamily: "Pulp"),
+                          ),
+                          Icon(Icons.comment,
+                          size: 18,
+                          color: Colors.grey,
+                          )
+                        ],
+                      ),
                     );
-                    recommendationController.clear();
-                    Get.snackbar("Success", "Recommendation added!");
-                  }
-                },
-                child: const Text("Submit"),
+                  }).toList(),
+                );
+              },
+            ),
+
+            const Divider(),
+
+            // Add Your Recommendation
+            const Text(
+              "Add Your Recommendation",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              style: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w400,
+                  fontSize: 16,
+                  fontFamily: "Pulp"),
+              controller: recommendationController,
+              decoration: InputDecoration(
+                labelText: "Enter your recommendation",
+                suffixIcon: GestureDetector(
+                  onTap: () async {
+                    String formattedDate =
+                        DateFormat('dd-MM-yyyy').format(DateTime.now());
+
+                    if (recommendationController.text.isNotEmpty) {
+                      await _firestoreService.addRecommendation(
+                          widget.bookId,
+                          widget.userId, // Replace with the current user's ID
+                          recommendationController.text,
+                          widget.userName,
+                          formattedDate);
+                      recommendationController.clear();
+                      Get.snackbar("Success", "Recommendation added!");
+                    }
+                  },
+                  child: Icon(
+                    Icons.send,
+                    color: Color(0XFF3CBBB1),
+                  ),
+                ),
+                helperStyle: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16,
+                    fontFamily: "Pulp"),
+                border: OutlineInputBorder(),
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 10),
+          ],
+        ),
       ),
     );
   }

@@ -16,9 +16,9 @@ import 'package:flutter/foundation.dart'
 /// ```
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
-    // if (kIsWeb) {
-    //   return web;
-    // }
+    if (kIsWeb) {
+      return web;
+    }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
@@ -47,16 +47,15 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
- apiKey: "AIzaSyDL60P5JiS9hDvwMQmyZSKkqThyjUFQwXI",
-  authDomain: "bookhive-d99ff.firebaseapp.com",
-  projectId: "bookhive-d99ff",
-  storageBucket: "bookhive-d99ff.firebasestorage.app",
-  messagingSenderId: "401459819675",
-  appId: "1:401459819675:web:ea756f5b6b4dab7425823e",
-  measurementId: "G-D0RF83Z3WF"
-  );
+      apiKey: "AIzaSyDL60P5JiS9hDvwMQmyZSKkqThyjUFQwXI",
+      authDomain: "bookhive-d99ff.firebaseapp.com",
+      projectId: "bookhive-d99ff",
+      storageBucket: "bookhive-d99ff.firebasestorage.app",
+      messagingSenderId: "401459819675",
+      appId: "1:401459819675:web:be88d45f9b085b6725823e",
+      measurementId: "G-J067MG58K6");
 
-  static const FirebaseOptions android = FirebaseOptions( 
+  static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDL60P5JiS9hDvwMQmyZSKkqThyjUFQwXI',
     appId: '1:401459819675:android:4612c7b20e7afb0825823e',
     messagingSenderId: '401459819675',
@@ -72,5 +71,4 @@ class DefaultFirebaseOptions {
   //   storageBucket: 'healthful-dev.firebasestorage.app',
   //   iosBundleId: 'com.hifah.healthful',
   // );
-
 }
