@@ -2,7 +2,6 @@ import 'package:book_hive_user/controllers/book_controller.dart';
 import 'package:book_hive_user/utils/toast_util.dart';
 import 'package:book_hive_user/views/authentication_view/login_view.dart';
 import 'package:book_hive_user/views/widgets/more_options_bottom_sheet_all_books.dart';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -26,7 +25,6 @@ class _AllBooksViewState extends State<AllBooksView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -68,9 +66,103 @@ class _AllBooksViewState extends State<AllBooksView> {
                   ),
                   IconButton(
                       onPressed: () {
-                        FirebaseAuth.instance.signOut();
-                        ToastUtil.showToast(message: "Logout Succesfully");
-                        Get.off(LoginView());
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              backgroundColor: const Color(
+                                  0xffFFFFFF), // Updated background color
+                              title: Text(
+                                "Logout",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(
+                                      0xff100C26), // White text for better contrast
+                                ),
+                              ),
+                              content: Text(
+                                "Are you sure want to logout?",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Color(
+                                      0xff100C26), // White text for better contrast
+                                ),
+                              ),
+                              actions: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    // Cancel Button
+                                    Expanded(
+                                      flex: 1,
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Color(0xffE6E6E6),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.of(context)
+                                              .pop(); // Close the dialog
+                                        },
+                                        child: Text(
+                                          "Cancel",
+                                          style: TextStyle(
+                                              color: Color(0xff0C091C),
+                                              fontSize: 12),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 5,
+                                    ),
+                                    // Remove Button
+                                    Obx(() {
+                                      return Expanded(
+                                        flex: 1,
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Color(0xffEE4266),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            FirebaseAuth.instance.signOut();
+                                            ToastUtil.showToast(
+                                                message: "Logout Succesfully");
+                                            Get.off(LoginView());
+                                          },
+                                          child: bookController.isLoading.value
+                                              ? Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    color: Colors.white,
+                                                  ),
+                                                )
+                                              : const Text(
+                                                  "Signout",
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 12),
+                                                ),
+                                        ),
+                                      );
+                                    })
+                                  ],
+                                ),
+                              ],
+                            );
+                          },
+                        );
                       },
                       icon: Icon(
                         Icons.logout,
@@ -179,8 +271,10 @@ class _AllBooksViewState extends State<AllBooksView> {
                                       builder: (BuildContext context) {
                                         return MoreOptionsBottomSheetAllBooks(
                                           bookId: book.id,
-                                          userName: bookController.currentUser.value!.name,
-                                          userId: bookController.currentUser.value!.id,
+                                          userName: bookController
+                                              .currentUser.value!.name,
+                                          userId: bookController
+                                              .currentUser.value!.id,
                                           authorName: book.author,
                                           bookName: book.title,
                                           description: book.description,
@@ -199,7 +293,8 @@ class _AllBooksViewState extends State<AllBooksView> {
                               ),
                               leading: CircleAvatar(
                                 backgroundColor: const Color(0xff3CBBB1),
-backgroundImage: AssetImage("assets/images/splash_logo.png"),
+                                backgroundImage:
+                                    AssetImage("assets/images/splash_logo.png"),
                               ),
                               title: Text(
                                 book.title,

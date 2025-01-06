@@ -20,15 +20,7 @@ class _SplashViewState extends State<SplashView> {
 
     // Navigate to LoginView or AllBooksView after 4 seconds
     Timer(const Duration(seconds: 4), () {
-      final currentUser = FirebaseAuth.instance.currentUser;
-
-      if (currentUser == null) {
-        // User is not logged in
-        Get.off(() => const LoginView());
-      } else {
-        // User is logged in
-        Get.off(() => const AllBooksView());
-      }
+    Get.to(LoginView());
     });
   }
 

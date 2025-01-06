@@ -34,7 +34,8 @@ class _RecommendationReplyBottomSheetState
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(), // Dismiss keyboard on tap outside
+      onTap: () =>
+          FocusScope.of(context).unfocus(), // Dismiss keyboard on tap outside
       child: Container(
         decoration: const BoxDecoration(
           color: Color(0xffF7F7F7),
@@ -46,7 +47,8 @@ class _RecommendationReplyBottomSheetState
         padding: EdgeInsets.only(
           left: 20.0,
           right: 20.0,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 20, // Adjust for keyboard
+          bottom: MediaQuery.of(context).viewInsets.bottom +
+              20, // Adjust for keyboard
         ),
         child: SingleChildScrollView(
           child: Column(
@@ -62,44 +64,52 @@ class _RecommendationReplyBottomSheetState
               const SizedBox(height: 20),
 
               // List of Replies
-              if (widget.replies.isNotEmpty)
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height * 0.4,
-                  ),
-                  child: ListView.builder(
-                    itemCount: widget.replies.length,
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      final reply = widget.replies[index];
-                      return ListTile(
-                        leading: SizedBox(
-                          height: 40,
-                          width: 40,
-                          child: Image.asset("assets/images/dummy_user_image.png"),
-                        ),
-                        title: Text(
-                          "${reply['userName']} • ${reply['date']}",
-                          style: const TextStyle(
-                            fontFamily: "Pulp",
-                            fontSize: 14,
-                            fontWeight: FontWeight.w300,
-                            color: Colors.black,
-                          ),
-                        ),
-                        subtitle: Text(
-                          reply['reply'],
-                          style: const TextStyle(
-                            fontFamily: "Pulp",
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
+              widget.replies.isEmpty
+                  ? Center(
+                      child: Text(
+                        "No reply yet. Be the first",
+                        style:
+                            TextStyle(color: Colors.black, fontFamily: "Pulp"),
+                      ),
+                    )
+                  : ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.4,
+                      ),
+                      child: ListView.builder(
+                        itemCount: widget.replies.length,
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          final reply = widget.replies[index];
+                          return ListTile(
+                            leading: SizedBox(
+                              height: 40,
+                              width: 40,
+                              child: Image.asset(
+                                  "assets/images/dummy_user_image.png"),
+                            ),
+                            title: Text(
+                              "${reply['userName']} • ${reply['date']}",
+                              style: const TextStyle(
+                                fontFamily: "Pulp",
+                                fontSize: 14,
+                                fontWeight: FontWeight.w300,
+                                color: Colors.black,
+                              ),
+                            ),
+                            subtitle: Text(
+                              reply['reply'],
+                              style: const TextStyle(
+                                fontFamily: "Pulp",
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
 
               const SizedBox(height: 20),
 
@@ -166,7 +176,8 @@ class _RecommendationReplyBottomSheetState
                           widget.replies.add({
                             'userId': widget.userId,
                             'reply': replyController.text,
-                            'date': DateFormat('dd-MM-yyyy').format(DateTime.now()),
+                            'date':
+                                DateFormat('dd-MM-yyyy').format(DateTime.now()),
                           });
                         });
 
@@ -175,7 +186,8 @@ class _RecommendationReplyBottomSheetState
                           message: "Reply Added Successfully",
                         );
                       } else {
-                        ToastUtil.showToast(message: "Please write a reply first");
+                        ToastUtil.showToast(
+                            message: "Please write a reply first");
                       }
                     },
                     icon: const Icon(
