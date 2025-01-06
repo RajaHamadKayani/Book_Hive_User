@@ -1,4 +1,6 @@
 import 'package:book_hive_user/services/firestore_services.dart';
+import 'package:book_hive_user/views/book_recommendation_replies_view.dart';
+import 'package:book_hive_user/views/widgets/recommendation_reply_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -32,7 +34,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
   final TextEditingController recommendationController =
       TextEditingController();
 
-  BookService _firestoreService = BookService();
+  final BookService _firestoreService = BookService();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -240,8 +242,15 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                 if (recommendations.isEmpty) {
                   return const Text("No recommendations yet.");
                 }
-                return Column(
-                  children: recommendations.map((recommendation) {
+
+                // Use ListView.builder for index access
+                return ListView.builder(
+                  itemCount: recommendations.length,
+                  shrinkWrap: true, // Required for nested ListView
+                  physics:
+                      const NeverScrollableScrollPhysics(), // Disable ListView scroll
+                  itemBuilder: (context, index) {
+                    final recommendation = recommendations[index];
                     return ListTile(
                       leading:
                           Image.asset("assets/images/dummy_user_image.png"),
@@ -255,7 +264,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                       ),
                       trailing: Text(
                         recommendation['dateTime'],
-                        style: TextStyle(
+                        style: const TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.w400,
                             fontFamily: "Pulp",
@@ -263,24 +272,43 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                       ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Text(
                             recommendation['recommendation'],
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w300,
                                 fontFamily: "Pulp"),
                           ),
-                          Icon(Icons.comment,
-                          size: 18,
-                          color: Colors.grey,
-                          )
+                          GestureDetector(
+                            onTap: () {
+                              showBottomSheet(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return RecommendationReplyBottomSheet(
+                                      userName: widget.userName,
+                                      userId: widget.userId,
+                                      bookId: widget.bookId,
+                                      recommendationIndex:
+                                          index, // Pass the index
+                                      recommendation:
+                                          recommendation['recommendation'],
+                                      replies: List.from(
+                                          recommendation['replies'] ?? []),
+                                    );
+                                  });
+                            },
+                            child: const Icon(
+                              Icons.comment,
+                              size: 18,
+                              color: Colors.grey,
+                            ),
+                          ),
                         ],
                       ),
                     );
-                  }).toList(),
+                  },
                 );
               },
             ),

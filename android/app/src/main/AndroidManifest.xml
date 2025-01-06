@@ -1,9 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 package="com.example.book_hive_user">
     <application
-        android:label="book_hive_user"
+        android:label="Book Hive"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/splash_logo">
         <activity
             android:name=".MainActivity"
             android:exported="true"

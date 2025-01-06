@@ -1,6 +1,6 @@
 import 'package:book_hive_user/models/book_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:intl/intl.dart';
 
 class BookService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -74,6 +74,30 @@ class BookService {
       });
     } catch (e) {
       throw Exception("Error adding recommendation: $e");
+    }
+  }
+  // Add a reply to a specific recommendation
+  Future<void> addReplyToRecommendation(String bookId, int recommendationIndex, String userId, String reply, String userName) async {
+    try {
+      final bookRef = _firestore.collection('books').doc(bookId);
+
+      // Format the current date
+      String formattedDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
+
+      // Build the reply object
+      final replyObject = {
+        'userId': userId,
+        'userName':userName,
+        'reply': reply,
+        'date': formattedDate,
+      };
+
+      // Update the specific recommendation with the reply
+      await bookRef.update({
+        'recommendations.$recommendationIndex.replies': FieldValue.arrayUnion([replyObject]),
+      });
+    } catch (e) {
+      throw Exception("Error adding reply: $e");
     }
   }
 }
