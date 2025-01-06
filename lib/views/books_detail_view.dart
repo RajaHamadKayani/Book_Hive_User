@@ -2,6 +2,7 @@ import 'package:book_hive_user/controllers/like_dislike_book_controller.dart';
 import 'package:book_hive_user/services/firestore_services.dart';
 import 'package:book_hive_user/utils/toast_util.dart';
 import 'package:book_hive_user/views/book_recommendation_replies_view.dart';
+import 'package:book_hive_user/views/widgets/book_rating_component.dart';
 import 'package:book_hive_user/views/widgets/recommendation_reply_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -328,7 +329,13 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                                 fontWeight: FontWeight.w300,
                                 fontFamily: "Pulp"),
                           ),
-                          GestureDetector(
+                       Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          BookRatingComponent(),
+                          const SizedBox(width: 5,),
+                             GestureDetector(
                             onTap: () {
                               showModalBottomSheet(
                                 context: context,
@@ -352,6 +359,8 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                               color: Colors.grey,
                             ),
                           ),
+                        ],
+                       )
                         ],
                       ),
                     );
