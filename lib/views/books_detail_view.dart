@@ -1,4 +1,6 @@
+import 'package:book_hive_user/controllers/like_dislike_book_controller.dart';
 import 'package:book_hive_user/services/firestore_services.dart';
+import 'package:book_hive_user/utils/toast_util.dart';
 import 'package:book_hive_user/views/book_recommendation_replies_view.dart';
 import 'package:book_hive_user/views/widgets/recommendation_reply_bottom_sheet.dart';
 import 'package:flutter/material.dart';
@@ -33,10 +35,14 @@ class BookDetailsPage extends StatefulWidget {
 class _BookDetailsPageState extends State<BookDetailsPage> {
   final TextEditingController recommendationController =
       TextEditingController();
+        final LikeDislikeBookController bookController = Get.put(LikeDislikeBookController());
+
 
   final BookService _firestoreService = BookService();
   @override
   Widget build(BuildContext context) {
+        bookController.listenToBook(widget.bookId);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -166,6 +172,48 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                       ),
                     ],
                   ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+              Obx(() {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Column(
+                    children: [
+                      Text("Likes: ${bookController.likes.length}"),
+                      IconButton(
+                        onPressed: () {
+                          bookController.toggleLike(widget.bookId, widget.userId);
+                        },
+                        icon: Icon(
+                          Icons.thumb_up,
+                          color: bookController.likes.contains(widget.userId)
+                              ? Colors.blue
+                              : Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      Text("Dislikes: ${bookController.dislikes.length}"),
+                      IconButton(
+                        onPressed: () {
+                          bookController.toggleDislike(widget.bookId, widget.userId);
+                        },
+                        icon: Icon(
+                          Icons.thumb_down,
+                          color: bookController.dislikes.contains(widget.userId)
+                              ? Colors.red
+                              : Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            }),
                 ],
               ),
             ),
@@ -238,17 +286,16 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                 if (snapshot.hasError) {
                   return Text("Error: ${snapshot.error}");
                 }
+
                 final recommendations = snapshot.data ?? [];
                 if (recommendations.isEmpty) {
                   return const Text("No recommendations yet.");
                 }
 
-                // Use ListView.builder for index access
                 return ListView.builder(
                   itemCount: recommendations.length,
-                  shrinkWrap: true, // Required for nested ListView
-                  physics:
-                      const NeverScrollableScrollPhysics(), // Disable ListView scroll
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (context, index) {
                     final recommendation = recommendations[index];
                     return ListTile(
@@ -283,21 +330,21 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              showBottomSheet(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return RecommendationReplyBottomSheet(
-                                      userName: widget.userName,
-                                      userId: widget.userId,
-                                      bookId: widget.bookId,
-                                      recommendationIndex:
-                                          index, // Pass the index
-                                      recommendation:
-                                          recommendation['recommendation'],
-                                      replies: List.from(
-                                          recommendation['replies'] ?? []),
-                                    );
-                                  });
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return RecommendationReplyBottomSheet(
+                                    userName: widget.userName,
+                                    userId: widget.userId,
+                                    bookId: widget.bookId,
+                                    recommendationIndex: index,
+                                    recommendation:
+                                        recommendation['recommendation'],
+                                    replies: List.from(
+                                        recommendation['replies'] ?? []),
+                                  );
+                                },
+                              );
                             },
                             child: const Icon(
                               Icons.comment,
@@ -320,18 +367,56 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
               "Add Your Recommendation",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
+
             const SizedBox(height: 10),
-            TextField(
-              style: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w400,
-                  fontSize: 16,
-                  fontFamily: "Pulp"),
-              controller: recommendationController,
-              decoration: InputDecoration(
-                labelText: "Enter your recommendation",
-                suffixIcon: GestureDetector(
-                  onTap: () async {
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: SizedBox(
+                    height: 40,
+                    width: 40,
+                    child: Image.asset(
+                      "assets/images/dummy_user_image.png",
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 4,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xffFF3CBBB1).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 1),
+                      child: TextFormField(
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 16,
+                          fontFamily: "Pulp",
+                        ),
+                        controller: recommendationController,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Enter your reply",
+                          hintStyle: TextStyle(
+                            color: Colors.black54,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 16,
+                            fontFamily: "Pulp",
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () async {
                     String formattedDate =
                         DateFormat('dd-MM-yyyy').format(DateTime.now());
 
@@ -343,23 +428,18 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                           widget.userName,
                           formattedDate);
                       recommendationController.clear();
-                      Get.snackbar("Success", "Recommendation added!");
+                      ToastUtil.showToast(
+                          message: "Recommendation Added Successfully");
                     }
                   },
-                  child: Icon(
+                  icon: const Icon(
                     Icons.send,
-                    color: Color(0XFF3CBBB1),
+                    color: Color(0xffFF3CBBB1),
                   ),
                 ),
-                helperStyle: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w400,
-                    fontSize: 16,
-                    fontFamily: "Pulp"),
-                border: OutlineInputBorder(),
-              ),
+              ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 40),
           ],
         ),
       ),

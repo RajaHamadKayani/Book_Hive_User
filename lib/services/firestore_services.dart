@@ -45,16 +45,19 @@ class BookService {
     }
   }
 
-  // Stream for recommendations
-  Stream<List<Map<String, dynamic>>> getRecommendationsStream(String bookId) {
-    return _firestore.collection('books').doc(bookId).snapshots().map((doc) {
-      if (doc.exists) {
-        final data = doc.data();
-        return List<Map<String, dynamic>>.from(data?['recommendations'] ?? []);
+Stream<List<Map<String, dynamic>>> getRecommendationsStream(String bookId) {
+  return _firestore.collection('books').doc(bookId).snapshots().map((doc) {
+    if (doc.exists) {
+      final data = doc.data();
+      // Ensure 'recommendations' is always treated as a list of maps
+      if (data != null && data['recommendations'] is List) {
+        return List<Map<String, dynamic>>.from(data['recommendations']);
       }
-      return [];
-    });
-  }
+    }
+    return [];
+  });
+}
+
 
   // Add a recommendation to Firestore
   Future<void> addRecommendation(String bookId, String userId,
@@ -77,27 +80,91 @@ class BookService {
     }
   }
   // Add a reply to a specific recommendation
-  Future<void> addReplyToRecommendation(String bookId, int recommendationIndex, String userId, String reply, String userName) async {
-    try {
-      final bookRef = _firestore.collection('books').doc(bookId);
+Future<void> addReplyToRecommendation(
+    String bookId, int recommendationIndex, String userId, String replyText, String userName) async {
+  final docRef = _firestore.collection('books').doc(bookId);
 
-      // Format the current date
-      String formattedDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
+  await _firestore.runTransaction((transaction) async {
+    final snapshot = await transaction.get(docRef);
 
-      // Build the reply object
-      final replyObject = {
-        'userId': userId,
-        'userName':userName,
-        'reply': reply,
-        'date': formattedDate,
-      };
-
-      // Update the specific recommendation with the reply
-      await bookRef.update({
-        'recommendations.$recommendationIndex.replies': FieldValue.arrayUnion([replyObject]),
-      });
-    } catch (e) {
-      throw Exception("Error adding reply: $e");
+    if (!snapshot.exists) {
+      throw Exception("Book document does not exist.");
     }
+
+    final data = snapshot.data();
+    if (data == null || data['recommendations'] == null) {
+      throw Exception("Recommendations field is missing or invalid.");
+    }
+
+    // Ensure recommendations is a List
+    final recommendations = List<Map<String, dynamic>>.from(data['recommendations']);
+
+    // Add reply to the specific recommendation
+    final updatedRecommendation = recommendations[recommendationIndex];
+    final replies = List<Map<String, dynamic>>.from(updatedRecommendation['replies'] ?? []);
+    replies.add({
+      'userId': userId,
+      'reply': replyText,
+      'date': DateFormat('dd-MM-yyyy').format(DateTime.now()),
+      'userName':userName
+    });
+
+    updatedRecommendation['replies'] = replies;
+    recommendations[recommendationIndex] = updatedRecommendation;
+
+    // Update Firestore document
+    transaction.update(docRef, {'recommendations': recommendations});
+  });
+}
+  // Toggle like
+  Future<void> toggleLike(String bookId, String userId) async {
+    DocumentReference bookRef = _firestore.collection('books').doc(bookId);
+
+    await _firestore.runTransaction((transaction) async {
+      DocumentSnapshot snapshot = await transaction.get(bookRef);
+
+      if (!snapshot.exists) throw Exception("Book not found");
+
+      List likes = snapshot['likes'] ?? [];
+      List dislikes = snapshot['dislikes'] ?? [];
+
+      if (likes.contains(userId)) {
+        likes.remove(userId); // Remove like
+      } else {
+        likes.add(userId); // Add like
+        dislikes.remove(userId); // Ensure user can't dislike
+      }
+
+      transaction.update(bookRef, {"likes": likes, "dislikes": dislikes});
+    });
   }
+
+  // Toggle dislike
+  Future<void> toggleDislike(String bookId, String userId) async {
+    DocumentReference bookRef = _firestore.collection('books').doc(bookId);
+
+    await _firestore.runTransaction((transaction) async {
+      DocumentSnapshot snapshot = await transaction.get(bookRef);
+
+      if (!snapshot.exists) throw Exception("Book not found");
+
+      List likes = snapshot['likes'] ?? [];
+      List dislikes = snapshot['dislikes'] ?? [];
+
+      if (dislikes.contains(userId)) {
+        dislikes.remove(userId); // Remove dislike
+      } else {
+        dislikes.add(userId); // Add dislike
+        likes.remove(userId); // Ensure user can't like
+      }
+
+      transaction.update(bookRef, {"likes": likes, "dislikes": dislikes});
+    });
+  }
+
+  // Stream for likes and dislikes
+  Stream<DocumentSnapshot> getBookStream(String bookId) {
+    return _firestore.collection('books').doc(bookId).snapshots();
+  }
+
 }
