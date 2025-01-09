@@ -1,7 +1,6 @@
 import 'package:book_hive_user/controllers/like_dislike_book_controller.dart';
 import 'package:book_hive_user/services/firestore_services.dart';
 import 'package:book_hive_user/utils/toast_util.dart';
-import 'package:book_hive_user/views/book_recommendation_replies_view.dart';
 import 'package:book_hive_user/views/widgets/book_rating_component.dart';
 import 'package:book_hive_user/views/widgets/recommendation_reply_bottom_sheet.dart';
 import 'package:flutter/material.dart';
@@ -36,13 +35,13 @@ class BookDetailsPage extends StatefulWidget {
 class _BookDetailsPageState extends State<BookDetailsPage> {
   final TextEditingController recommendationController =
       TextEditingController();
-        final LikeDislikeBookController bookController = Get.put(LikeDislikeBookController());
-
+  final LikeDislikeBookController bookController =
+      Get.put(LikeDislikeBookController());
 
   final BookService _firestoreService = BookService();
   @override
   Widget build(BuildContext context) {
-        bookController.listenToBook(widget.bookId);
+    bookController.listenToBook(widget.bookId);
 
     return Scaffold(
       appBar: AppBar(
@@ -176,45 +175,49 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                   const SizedBox(
                     height: 20,
                   ),
-              Obx(() {
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Column(
-                    children: [
-                      Text("Likes: ${bookController.likes.length}"),
-                      IconButton(
-                        onPressed: () {
-                          bookController.toggleLike(widget.bookId, widget.userId);
-                        },
-                        icon: Icon(
-                          Icons.thumb_up,
-                          color: bookController.likes.contains(widget.userId)
-                              ? Colors.blue
-                              : Colors.grey,
+                  Obx(() {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Column(
+                          children: [
+                            Text("Likes: ${bookController.likes.length}"),
+                            IconButton(
+                              onPressed: () {
+                                bookController.toggleLike(
+                                    widget.bookId, widget.userId);
+                              },
+                              icon: Icon(
+                                Icons.thumb_up,
+                                color:
+                                    bookController.likes.contains(widget.userId)
+                                        ? Colors.blue
+                                        : Colors.grey,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Text("Dislikes: ${bookController.dislikes.length}"),
-                      IconButton(
-                        onPressed: () {
-                          bookController.toggleDislike(widget.bookId, widget.userId);
-                        },
-                        icon: Icon(
-                          Icons.thumb_down,
-                          color: bookController.dislikes.contains(widget.userId)
-                              ? Colors.red
-                              : Colors.grey,
+                        Column(
+                          children: [
+                            Text("Dislikes: ${bookController.dislikes.length}"),
+                            IconButton(
+                              onPressed: () {
+                                bookController.toggleDislike(
+                                    widget.bookId, widget.userId);
+                              },
+                              icon: Icon(
+                                Icons.thumb_down,
+                                color: bookController.dislikes
+                                        .contains(widget.userId)
+                                    ? Colors.red
+                                    : Colors.grey,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              );
-            }),
+                      ],
+                    );
+                  }),
                 ],
               ),
             ),
@@ -258,7 +261,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                         // Add your delete or favorite functionality here
                       },
                       child: const Text(
-                        "Favorite",
+                        "Favorite", 
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.white,
@@ -299,6 +302,8 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                   physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (context, index) {
                     final recommendation = recommendations[index];
+                        final ratings = List<Map<String, dynamic>>.from(recommendation['ratings'] ?? []);
+
                     return ListTile(
                       leading:
                           Image.asset("assets/images/dummy_user_image.png"),
@@ -329,38 +334,44 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                                 fontWeight: FontWeight.w300,
                                 fontFamily: "Pulp"),
                           ),
-                       Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          BookRatingComponent(),
-                          const SizedBox(width: 5,),
-                             GestureDetector(
-                            onTap: () {
-                              showModalBottomSheet(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return RecommendationReplyBottomSheet(
-                                    userName: widget.userName,
-                                    userId: widget.userId,
-                                    bookId: widget.bookId,
-                                    recommendationIndex: index,
-                                    recommendation:
-                                        recommendation['recommendation'],
-                                    replies: List.from(
-                                        recommendation['replies'] ?? []),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              BookRatingComponent(
+                                userId: widget.userId,
+                                bookId: widget.bookId,
+                                ratings:ratings,
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return RecommendationReplyBottomSheet(
+                                        userName: widget.userName,
+                                        userId: widget.userId,
+                                        bookId: widget.bookId,
+                                        recommendationIndex: index,
+                                        recommendation:
+                                            recommendation['recommendation'],
+                                        replies: List.from(
+                                            recommendation['replies'] ?? []),
+                                      );
+                                    },
                                   );
                                 },
-                              );
-                            },
-                            child: const Icon(
-                              Icons.comment,
-                              size: 18,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
-                       )
+                                child: const Icon(
+                                  Icons.comment,
+                                  size: 18,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          )
                         ],
                       ),
                     );

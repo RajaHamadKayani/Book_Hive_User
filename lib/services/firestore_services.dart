@@ -167,5 +167,34 @@ Future<void> addReplyToRecommendation(
     return _firestore.collection('books').doc(bookId).snapshots();
   }
 
+Future<void> updateBookRating(String bookId, String userId, int rating) async {
+  final bookRef = _firestore.collection('books').doc(bookId);
+  await _firestore.runTransaction((transaction) async {
+    final snapshot = await transaction.get(bookRef);
+    if (!snapshot.exists) throw Exception("Book does not exist!");
+
+    final data = snapshot.data();
+    final ratings = List<Map<String, dynamic>>.from(data?['ratings'] ?? []);
+    final existingRatingIndex = ratings.indexWhere((r) => r['userId'] == userId);
+
+    if (existingRatingIndex != -1) {
+      // Update existing rating
+      ratings[existingRatingIndex]['rating'] = rating;
+    } else {
+      // Add new rating
+      ratings.add({'userId': userId, 'rating': rating});
+    }
+
+    transaction.update(bookRef, {'ratings': ratings});
+  });
+}
+ Future<void> updateUserProfile(String userId, Map<String, dynamic> updatedData) async {
+    try {
+      await _firestore.collection('users').doc(userId).update(updatedData);
+    } catch (e) {
+      throw Exception("Error updating user profile: $e");
+    }
+  }
+
 
 }

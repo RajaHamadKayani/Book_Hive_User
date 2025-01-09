@@ -1,6 +1,8 @@
 import 'package:book_hive_user/controllers/book_controller.dart';
 import 'package:book_hive_user/utils/toast_util.dart';
 import 'package:book_hive_user/views/authentication_view/login_view.dart';
+import 'package:book_hive_user/views/drawer_widget.dart';
+import 'package:book_hive_user/views/profile_view.dart';
 import 'package:book_hive_user/views/widgets/more_options_bottom_sheet_all_books.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +16,7 @@ class AllBooksView extends StatefulWidget {
 }
 
 class _AllBooksViewState extends State<AllBooksView> {
+  GlobalKey<ScaffoldState> globalKey=GlobalKey<ScaffoldState>();
   final BookController bookController = Get.put(BookController());
 
   @override
@@ -25,6 +28,8 @@ class _AllBooksViewState extends State<AllBooksView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: DrawerWidget(),
+      key: globalKey,
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -37,7 +42,7 @@ class _AllBooksViewState extends State<AllBooksView> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      Get.back(); // Navigate back
+                      globalKey.currentState!.openDrawer();
                     },
                     child: Container(
                       height: 46,
@@ -48,7 +53,7 @@ class _AllBooksViewState extends State<AllBooksView> {
                       ),
                       child: const Center(
                         child: Icon(
-                          Icons.arrow_back_ios,
+                          Icons.menu,
                           size: 18,
                           color: Color(0xff1F1C33),
                         ),
@@ -191,13 +196,31 @@ class _AllBooksViewState extends State<AllBooksView> {
               }
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Text(
-                  "Welcome, ${bookController.currentUser.value!.name}!",
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    fontFamily: "Pulp",
-                    color: Colors.black,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ProfileView(
+                              uid: bookController.currentUser.value!.id,
+                                  address:
+                                      bookController.currentUser.value!.address,
+                                  DOB: bookController.currentUser.value!.dob,
+                                  name: bookController.currentUser.value!.name,
+                                  phone:
+                                      bookController.currentUser.value!.phone,
+                                  email:
+                                      bookController.currentUser.value!.email,
+                                )));
+                  },
+                  child: Text(
+                    "Welcome, ${bookController.currentUser.value!.name}!",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      fontFamily: "Pulp",
+                      color: Colors.black,
+                    ),
                   ),
                 ),
               );
