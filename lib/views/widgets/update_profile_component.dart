@@ -39,6 +39,7 @@ class _UpdateProfileComponentState extends State<UpdateProfileComponent> {
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 3),
             child: TextFormField(
               style: TextStyle(
+                fontFamily: "Pulp",
                 color: Colors.black
               ),
               controller: widget.controller,

@@ -1,3 +1,4 @@
+import 'package:book_hive_user/controllers/book_controller.dart';
 import 'package:book_hive_user/controllers/update_profile_controller.dart';
 import 'package:book_hive_user/views/widgets/update_profile_component.dart';
 import 'package:flutter/foundation.dart';
@@ -25,6 +26,7 @@ class UpdateProfileView extends StatefulWidget {
 }
 
 class _UpdateProfileViewState extends State<UpdateProfileView> {
+  BookController bookController = Get.put(BookController());
   UpdateProfileController updateProfileController =
       Get.put(UpdateProfileController());
   @override
@@ -117,9 +119,14 @@ class _UpdateProfileViewState extends State<UpdateProfileView> {
                     ),
                     Center(child: Obx(() {
                       return GestureDetector(
-                        onTap: () {
-                          updateProfileController.updateProfile(widget.uid);
-                          Get.back();
+                        onTap: () async {
+                          updateProfileController.isLoading.value = true;
+                          await updateProfileController
+                              .updateProfile(widget.uid); // Update the profile
+                          await bookController
+                              .fetchCurrentUser(); // Refresh user data
+                          updateProfileController.isLoading.value = false;
+                          Get.back(); // Navigate back to ProfileView
                         },
                         child: Container(
                           width: 225,

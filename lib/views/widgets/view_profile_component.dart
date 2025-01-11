@@ -37,7 +37,10 @@ class _ViewProfileComponentState extends State<ViewProfileComponent> {
                   border: Border.all(color: Color(0xffB5B5B5), width: 1)),
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                child:Text(widget.value),
+                child:Text(widget.value,
+                style: TextStyle(
+                  fontFamily: "Pulp"
+                ),),
               ),
             )
       ],

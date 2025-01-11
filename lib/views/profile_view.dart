@@ -1,3 +1,4 @@
+import 'package:book_hive_user/controllers/book_controller.dart';
 import 'package:book_hive_user/views/update_profile_view.dart';
 import 'package:book_hive_user/views/widgets/view_profile_component.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,13 @@ class ProfileView extends StatefulWidget {
 }
 
 class _ProfileViewState extends State<ProfileView> {
+  BookController bookController=Get.put(BookController());
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    bookController.fetchCurrentUser();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,66 +64,83 @@ class _ProfileViewState extends State<ProfileView> {
                         ),
                       ),
                     ),
-            Expanded(
+              Expanded(
               child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Center(
-                      child: SizedBox(
-                        height: 100,
-                        width: 100,
-                        child: Image.asset(
-                          "assets/images/dummy_user_image.png",
-                          fit: BoxFit.cover,
-                          height: double.infinity,
-                          width: double.infinity,
+                child: Obx(() {
+                  // Check if the user data is still loading
+                  if (bookController.isLoadingUser.value) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  final user = bookController.currentUser.value;
+                  if (user == null) {
+                    return const Center(
+                      child: Text("User data not available."),
+                    );
+                  }
+
+                  return Column(
+                    children: [
+                      Center(
+                        child: SizedBox(
+                          height: 100,
+                          width: 100,
+                          child: Image.asset(
+                            "assets/images/dummy_user_image.png",
+                            fit: BoxFit.cover,
+                            height: double.infinity,
+                            width: double.infinity,
+                          ),
                         ),
                       ),
-                    ),
-                       ViewProfileComponent(title: "Name", value: widget.name),
-                ViewProfileComponent(title: "Email", value: widget.email),
-                ViewProfileComponent(title: "Phone", value: widget.phone),
-                ViewProfileComponent(title: "Address", value: widget.address),
-                ViewProfileComponent(title: "Date Of Birth", value: widget.DOB),
-                const SizedBox(height: 30,),
-                  Center(
-                child: InkWell(
-                  onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=> UpdateProfileView(
-                      uid: widget.uid,
-                      DOB: widget.DOB,
-                      name: widget.name,
-                      address: widget.address,
-                      phone: widget.phone,
-                      email: widget.email,
-                    )));
-                  },
-                  child: Container(
-                    width: 225,
-                    decoration: BoxDecoration(
-                      color: Color(0XFF3CBBB1),
-                      borderRadius: BorderRadius.circular(6)
-                    ),
-                        child: Padding(padding: EdgeInsets.symmetric(
-                          vertical: 13
+                      ViewProfileComponent(title: "Name", value: user.name),
+                      ViewProfileComponent(title: "Email", value: user.email),
+                      ViewProfileComponent(title: "Phone", value: user.phone),
+                      ViewProfileComponent(title: "Address", value: user.address),
+                      ViewProfileComponent(title: "Date Of Birth", value: user.dob),
+                      const SizedBox(height: 30),
+                      Center(
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => UpdateProfileView(
+                                  uid: user.id,
+                                  DOB: user.dob,
+                                  name: user.name,
+                                  address: user.address,
+                                  phone: user.phone,
+                                  email: user.email,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            width: 225,
+                            decoration: BoxDecoration(
+                              color: const Color(0XFF3CBBB1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 13),
+                              child: const Center(
+                                child: Text(
+                                  "Update",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
-                        child: Center(
-                          child: Text("Update",
-                          style: TextStyle(
-                            color: Colors.white
-                          ),),
-                        ),),
-                    
-                  ),
-                ),
-              )
-                  ],
-                ),
+                      ),
+                    ],
+                  );
+                }),
               ),
-            ),
          
           
-          ],
+        )],
         ),
       )),
     );
