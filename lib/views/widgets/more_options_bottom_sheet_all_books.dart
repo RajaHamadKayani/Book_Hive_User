@@ -1,6 +1,8 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:book_hive_user/controllers/book_controller.dart';
+import 'package:book_hive_user/controllers/book_mark_controller.dart';
+import 'package:book_hive_user/models/book_model.dart';
 import 'package:book_hive_user/utils/constants.dart';
 import 'package:book_hive_user/views/books_detail_view.dart';
 import 'package:book_hive_user/views/remove_book_view.dart';
@@ -18,7 +20,6 @@ class MoreOptionsBottomSheetAllBooks extends StatefulWidget {
   String bookId;
   String userId;
   String userName;
-
 
   MoreOptionsBottomSheetAllBooks(
       {super.key,
@@ -53,6 +54,8 @@ class _MoreOptionsBottomSheetAllBooksState
       print("User Id ${widget.userId}");
     }
   }
+
+  BookMarkController bookMarkController = Get.put(BookMarkController());
 
   @override
   Widget build(BuildContext context) {
@@ -266,16 +269,47 @@ class _MoreOptionsBottomSheetAllBooksState
                 onTap: () {
                   Get.back(); // Close the bottom sheet
                   Get.to(() => BookDetailsPage(
-                    userName: widget.userName,
+                        userName: widget.userName,
                         bookId: widget.bookId,
                         userId: widget.userId,
                         bookName: widget.bookName,
                         authorName: widget.authorName,
-
                         genre: widget.genre,
                         description: widget.description,
                         dateTime: widget.dateTime,
                       ));
+                },
+              ),
+            ),
+            GestureDetector(
+              child: ListTile(
+                leading: Container(
+                  height: 48,
+                  width: 48,
+                  decoration: BoxDecoration(
+                      color: Color(0xff333333),
+                      borderRadius: BorderRadius.circular(120)),
+                  child: Center(
+                    child: Image.asset("assets/images/info.png"),
+                  ),
+                ),
+                title: Text(
+                  "Book Mark",
+                  style: TextStyle(
+                      fontFamily: "Pulp",
+                      color: Color(0xff100C26),
+                      fontWeight: FontWeight.w400,
+                      fontSize: textSize.medium),
+                ),
+                onTap: () {
+                  Book book = Book(
+                      id: widget.bookId,
+                      title: widget.bookName,
+                      description: widget.description,
+                      author: widget.authorName,
+                      genre: widget.genre,
+                      createdAt: widget.dateTime);
+                  bookMarkController.addBookToBookMark(book);
                 },
               ),
             ),

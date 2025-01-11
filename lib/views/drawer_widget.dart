@@ -1,3 +1,6 @@
+import 'package:book_hive_user/controllers/book_controller.dart';
+import 'package:book_hive_user/views/bookmarks_view.dart';
+import 'package:book_hive_user/views/profile_view.dart';
 import 'package:book_hive_user/views/terms_and_policies_view.dart';
 import 'package:book_hive_user/views/widgets/drawer_component.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +14,8 @@ class DrawerWidget extends StatefulWidget {
 }
 
 class _DrawerWidgetState extends State<DrawerWidget> {
+    final BookController bookController = Get.put(BookController());
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -86,12 +91,35 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          DrawerComponent(
-                              iamge: "assets/images/person.png",
-                              title: "Edit Profile"),
-                          DrawerComponent(
-                              iamge: "assets/images/security.png",
-                              title: "Security"),
+                          GestureDetector(
+                            onTap: (){
+                                Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ProfileView(
+                              uid: bookController.currentUser.value!.id,
+                                  address:
+                                      bookController.currentUser.value!.address,
+                                  DOB: bookController.currentUser.value!.dob,
+                                  name: bookController.currentUser.value!.name,
+                                  phone:
+                                      bookController.currentUser.value!.phone,
+                                  email:
+                                      bookController.currentUser.value!.email,
+                                )));
+                            },
+                            child: DrawerComponent(
+                                iamge: "assets/images/person.png",
+                                title: "Edit Profile"),
+                          ),
+                          GestureDetector(
+                            onTap: (){
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=> const BookmarksView()));
+                            },
+                            child: DrawerComponent(
+                                iamge: "assets/images/security.png",
+                                title: "Book Mark"),
+                          ),
                           DrawerComponent(
                               iamge: "assets/images/notification.png",
                               title: "Notifications"),

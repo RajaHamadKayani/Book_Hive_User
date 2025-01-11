@@ -196,31 +196,13 @@ class _AllBooksViewState extends State<AllBooksView> {
               }
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ProfileView(
-                              uid: bookController.currentUser.value!.id,
-                                  address:
-                                      bookController.currentUser.value!.address,
-                                  DOB: bookController.currentUser.value!.dob,
-                                  name: bookController.currentUser.value!.name,
-                                  phone:
-                                      bookController.currentUser.value!.phone,
-                                  email:
-                                      bookController.currentUser.value!.email,
-                                )));
-                  },
-                  child: Text(
-                    "Welcome, ${bookController.currentUser.value!.name}!",
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: "Pulp",
-                      color: Colors.black,
-                    ),
+                child: Text(
+                  "Welcome, ${bookController.currentUser.value!.name}!",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: "Pulp",
+                    color: Colors.black,
                   ),
                 ),
               );
