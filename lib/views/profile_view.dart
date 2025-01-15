@@ -25,13 +25,14 @@ class ProfileView extends StatefulWidget {
 }
 
 class _ProfileViewState extends State<ProfileView> {
-  BookController bookController=Get.put(BookController());
+  BookController bookController = Get.put(BookController());
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     bookController.fetchCurrentUser();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,29 +43,29 @@ class _ProfileViewState extends State<ProfileView> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-             GestureDetector(
-                      onTap: () {
-                        Get.back(); // Navigate back
-                      },
-                      child: Container(
-                        height: 46,
-                        width: 46,
-                        decoration: BoxDecoration(
-                            color: const Color(0xffF2F2F5),
-                            borderRadius: BorderRadius.circular(50)),
-                        child: const Center(
-                          child: Padding(
-                            padding: EdgeInsets.only(left: 4),
-                            child: Icon(
-                              Icons.arrow_back_ios,
-                              size: 18,
-                              color: Color(0xff1F1C33),
-                            ),
-                          ),
-                        ),
-                      ),
+            GestureDetector(
+              onTap: () {
+                Get.back(); // Navigate back
+              },
+              child: Container(
+                height: 46,
+                width: 46,
+                decoration: BoxDecoration(
+                    color: const Color(0xffF2F2F5),
+                    borderRadius: BorderRadius.circular(50)),
+                child: const Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 4),
+                    child: Icon(
+                      Icons.arrow_back_ios,
+                      size: 18,
+                      color: Color(0xff1F1C33),
                     ),
-              Expanded(
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
               child: SingleChildScrollView(
                 child: Obx(() {
                   // Check if the user data is still loading
@@ -96,8 +97,10 @@ class _ProfileViewState extends State<ProfileView> {
                       ViewProfileComponent(title: "Name", value: user.name),
                       ViewProfileComponent(title: "Email", value: user.email),
                       ViewProfileComponent(title: "Phone", value: user.phone),
-                      ViewProfileComponent(title: "Address", value: user.address),
-                      ViewProfileComponent(title: "Date Of Birth", value: user.dob),
+                      ViewProfileComponent(
+                          title: "Address", value: user.address),
+                      ViewProfileComponent(
+                          title: "Date Of Birth", value: user.dob),
                       const SizedBox(height: 30),
                       Center(
                         child: InkWell(
@@ -138,9 +141,8 @@ class _ProfileViewState extends State<ProfileView> {
                   );
                 }),
               ),
-         
-          
-        )],
+            )
+          ],
         ),
       )),
     );
